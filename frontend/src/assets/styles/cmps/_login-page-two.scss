@@ -1,0 +1,112 @@
+.email-password-container {
+    @include flex-column;
+    margin-bottom: 16px;
+
+    .login-header {
+        font-size: 40px;
+        font-weight: 100;
+
+        b {
+            font-family: roboto-black;
+        }
+    }
+
+    .email-page-two {
+        margin-top: 28px;
+        width: 100%;
+    }
+
+}
+
+.email-password-input-and-button-container {
+    margin-bottom: 2rem;
+
+}
+
+.form-input-container {
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 100px;
+    margin-bottom: 20px;
+
+    .email-password-label {
+        position: relative;
+        align-self: center;
+        color: #777;
+    }
+
+    .email-input-container {
+        height: auto;
+        width: $button-width;
+        margin-left: 12px;
+
+        .email-input {
+            @include login-input;
+
+        }
+    }
+
+    .password-input-container {
+        height: auto;
+        width: $button-width;
+        margin-left: 12px;
+
+        .password-input {
+            @include login-input;
+
+        }
+    }
+}
+
+.login-fb {
+    display: flex;
+    margin: 0 auto;
+    font-size: rem(16px);
+    line-height: rem(16px);
+    background-color: rgb(12, 102, 174);
+    border: 2px solid rgb(211 233 252 / 52%);
+    border-radius: 5px;
+    padding: 0;
+
+    svg {
+        padding: 8px;
+        font-size: rem(24px);
+        padding-right: 8px;
+        border-right: 1px solid rgba(211, 233, 252, 0.543);
+    }
+
+    span {
+        align-self: center;
+        padding: 10px;
+    }
+
+    &:hover {
+        cursor: pointer;
+        padding: 1px;
+    }
+}
+
+.next-btn-wrapper {
+    display: flex;
+    justify-content: center;
+
+    .next-btn-container {
+        width: $button-width;
+    }
+}
+
+.next-btn-wrapper-sign-up {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    right: 9.8px;
+    // max-width:$button-width;
+
+    .next-btn-container {
+        width: $button-width;
+    }
+}
+
+.other-acc-btn {
+    @include login-link-back;
+}

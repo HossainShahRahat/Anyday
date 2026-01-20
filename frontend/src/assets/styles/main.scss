@@ -1,0 +1,43 @@
+// Setup
+@import "setup/variables";
+@import "setup/functions";
+@import "setup/mixins";
+@import "setup/typography";
+
+// Basics
+@import "basics/helpers";
+@import "basics/layout";
+@import "basics/base";
+@import "basics/links";
+@import "basics/forms";
+
+// Views
+@import "views/home-page";
+@import "views/user-details";
+@import "views/login-signup-page";
+@import "views/board-details";
+@import "views/kanban";
+@import "views/dashboard";
+
+
+// Components
+@import "cmps/nav-bar";
+@import "cmps/user-msg";
+@import "cmps/board-header";
+@import "cmps/group-preview";
+@import "cmps/login-page-two";
+@import "cmps/board-list";
+@import "cmps/select-board";
+@import "cmps/task-preview";
+@import "cmps/task-details";
+@import "cmps/add-label-modal";
+@import "cmps/status-modal";
+@import "cmps/priority-modal";
+@import "cmps/task-modal";
+@import "cmps/sum-groups";
+@import "cmps/text-editor";
+@import "cmps/checkbox-modal";
+@import "cmps/filter-modal";
+@import "cmps/sort-groups";
+@import "cmps/templates";
+@import "cmps/waves";

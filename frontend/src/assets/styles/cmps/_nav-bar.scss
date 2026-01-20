@@ -1,0 +1,360 @@
+.nav-bar {
+  display: none;
+
+  @include for-narrow-layout {
+    display: block;
+
+    min-height: 100vh;
+    background-color: $side-nav-bgc;
+    text-align: center;
+    width: 65px;
+    position: sticky;
+    top: 0;
+    z-index: 101;
+
+    nav {
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 65px;
+
+      .spacer-nav {
+
+        width: rem(50px);
+        border-top: 0.5px solid #676879;
+        position: relative;
+        left: 8px;
+        top: 5px;
+        margin-bottom: 20px;
+        background-color: #676879;
+
+      }
+
+      // img {
+      //   &:hover {
+      //     background-color: #131523;
+      //     border-radius: 6px;
+      //     text-transform: none;
+      //   }
+      // }
+
+      .main-board-link-container {
+        position: relative;
+        left: 15px;
+        width: 36px;
+        height: 36px;
+        bottom: 2px;
+        background-color: rgba(173, 171, 171, 0.3);
+        border-radius: 6px;
+        margin: 0;
+
+      }
+
+      a.active {
+        position: relative;
+        bottom: 37px;
+
+        img {}
+      }
+    }
+  }
+
+}
+
+.side-bar-spacer {
+  @include spacer;
+  padding-top: 10px;
+}
+
+.side-board-btn-container {
+  display: none;
+
+  @include for-narrow-layout {
+
+    display: block;
+
+    padding-top: 9px;
+    font-size: rem(14px);
+
+    button,
+    input {
+      font-family: figtree-regular;
+    }
+
+    >* {
+      height: 32px;
+    }
+
+    .input {
+      padding-top: 11px;
+    }
+  }
+}
+
+.side-group-bar {
+
+  display: none;
+
+  @include for-narrow-layout {
+    display: block;
+    position: sticky;
+    top: 0;
+    padding: 13px;
+    background-color: $main-side-bar-bgc;
+    width: 255px;
+    min-height: 100vh;
+    border-right: 1px solid $cell-border-color;
+    // transition: .1s, rotate .1s;
+    z-index: 100;
+
+    &.closed {
+      width: 30px;
+    }
+
+    .open-side-bar-btn {
+      @include side-bar-btn;
+
+      &:hover {
+        @include side-bar-btn-hover;
+        padding-left: 10px;
+      }
+    }
+  }
+}
+
+.closed-btn {
+  rotate: 180deg;
+  left: 20px;
+}
+
+.close-side-bar-btn {
+  display: none;
+
+  @include for-narrow-layout {
+    display: block;
+
+    @include side-bar-btn;
+    position: absolute;
+    right: -6%;
+    cursor: pointer;
+
+    &:hover {
+      @include side-bar-btn-hover;
+      padding-right: 10px;
+
+      svg {
+        color: $main-bgc-white;
+      }
+    }
+  }
+}
+
+.workspace-select {
+  flex-direction: column;
+  gap: 5px;
+  padding-top: 3px;
+
+  span {
+    font-size: rem(16px);
+    font-family: figtree-regular;
+    font-weight: 600;
+  }
+}
+
+.workspace {
+  padding: 8px 10px;
+  border-radius: 4px;
+  border: 1px solid #676879;
+  margin-right: 5px;
+  @include flex-center;
+  justify-content: flex-start;
+  gap: 6px;
+}
+
+.workspace-header {
+  color: $icon-color;
+  font-weight: 400;
+  font-size: rem(14px);
+  font-family: figtree-light;
+  line-height: 21px;
+}
+
+.nav-bar-logo {
+  position: relative;
+  max-height: 44px;
+  min-width: 40.5px !important;
+  max-width: 40.5px;
+  object-fit: contain;
+  top: 10px;
+  filter: brightness(95%);
+}
+
+.nav-bar-board-logo-container {
+  background-color: rgba(0, 0, 0, 50%);
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.nav-user-hr,
+.nav-logo-hr {
+  opacity: 0.25;
+  margin-top: 18px;
+  width: 75%;
+}
+
+.nav-user-hr {
+  position: absolute;
+  bottom: 54px;
+  left: 8px;
+}
+
+.nav-bar-triangle{
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-right: 10px solid #f5f6fa;
+  position: absolute;
+  left: 58px;
+  top: 76px;
+}
+
+.nav-bar-board-logo {
+  min-width: 36px;
+  position: relative;
+  // top: 2px;
+  top: 10px;
+  // mix-blend-mode: plus-lighter;
+}
+
+.nav-bar-avatar {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  width: 44px;
+  height: 44px;
+}
+
+.nav-bar-avatar-img {
+  // color: $main-bgc-white;
+  // background-color: #1c4f92;
+  // border: 2px solid $main-bgc-white;
+  line-height: 40px;
+  font-size: rem(22px);
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  width: 44px;
+  height: 44px;
+  border-radius: 25em;
+  object-fit: contain;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.nav-bar-logout-btn {
+  max-width: 70px;
+}
+
+.miniUserPanel {
+  text-align: center;
+  background-color: $main-bgc-white;
+  width: 300px;
+  height: 300px;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  bottom: 16px;
+  left: 56px;
+  border-radius: 1em;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
+}
+
+.crown-container {
+  position: relative;
+  display: inline-block;
+  height: 24px;
+  width: 24px;
+  background-color: #f279f2;
+  border-radius: 8px;
+  @include flex-center;
+
+  .house-icon {
+    position: absolute;
+    color: #323338;
+    width: 12px;
+    bottom: -3px;
+    right: -7px;
+  }
+
+  svg {
+    color: $main-bgc-white;
+  }
+}
+
+// .arrow-left {
+//   @include arrow-up-modal(-13px);
+//   rotate: -90deg;
+//   // right: 120px;
+//   top: rem(69px);
+
+// }
+
+
+.miniUserPanel {
+  #imgUpload {
+    opacity: 0;
+    width: 300px !important;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  #file-upload-button {
+    position: absolute;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  .task-details-input-upload {
+    position: absolute;
+    bottom: 110px;
+  }
+
+  .nav-bar-avatar-img {
+    top: 69px;
+    left: 107px;
+    width: 80px;
+    height: 80px;
+    line-height: 76px;
+    font-size: 36px;
+  }
+
+  .uploaded-img {
+    position: absolute;
+    top: 69px;
+    left: 107px;
+    width: 80px;
+    height: 80px;
+    z-index: 3;
+    border-radius: 25em;
+  }
+}
+
+
+.arrow-up-modal {
+  width: 0; 
+  height: 0; 
+  border-left: 10px solid transparent !important;
+  border-right: 10px solid transparent !important;
+  
+  border-bottom: 10px solid $main-bgc-white;
+}

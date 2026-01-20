@@ -1,0 +1,316 @@
+/* Breakpoint mixins */
+
+@mixin for-mobile-layout {
+  @media (max-width: calc($mobile-breakpoint + $layoutPadding * 2)) {
+    @content;
+  }
+}
+
+// 530px
+@mixin for-narrow-layout {
+  @media (min-width: calc($mobile-breakpoint + $layoutPadding * 2)) {
+    @content;
+  }
+}
+
+//777px
+@mixin for-normal-layout {
+  @media (min-width: calc($narrow-breakpoint + $layoutPadding * 2)) {
+    @content;
+  }
+}
+
+//1000px
+@mixin for-wide-layout {
+  @media (min-width: calc($normal-breakpoint + $layoutPadding * 2)) {
+    @content;
+  }
+}
+
+/* Media  Mixins */
+@mixin aspect-ratio($width, $height) {
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    display: block;
+    content: "";
+    width: 100%;
+    padding-top: calc(($height / $width) * 100%);
+  }
+
+  >* {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  >img {
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+// Mixin for removing hover efects on iphone screen
+@mixin hover-supported {
+  @media not all and (pointer: coarse) {
+    &:hover {
+      @content;
+    }
+  }
+}
+
+@mixin hover-supported-header {
+  @media not all and (pointer: coarse) {
+    &:hover {
+      @content;
+    }
+  }
+}
+
+//mixin for header home page and login page
+
+@mixin btn-no-style {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+@mixin header {
+  width: 100%;
+  display: block;
+  padding-top: 10px;
+  padding-left: 8px;
+  border-bottom: 1px solid $header-border-bottom;
+  height: 65px;
+  background-color: $header-grey;
+}
+
+@mixin header-logo {
+  width: 40.5px;
+  height: 28px;
+  // width: 180px;
+  // height: 44px;
+  margin-left: 12px;
+}
+
+// login section mixins
+@mixin login-layout {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  color: #333;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin login-btn {
+  width: $fullPrecent;
+  min-width: $fullPrecent;
+  height: 100%;
+  cursor: pointer;
+  outline: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  line-height: 28px;
+  border: none;
+  font-size: 18px;
+  color: $main-bgc-white;
+  background-color: $btn-blue;
+  margin: 0;
+  margin-top: 20px;
+  padding: 8px 16px;
+  border-radius: 4px;
+}
+
+@mixin login-link-back {
+  border: none;
+  margin: 0;
+  padding: 0;
+  width: auto;
+  overflow: visible;
+  background: transparent;
+  font: inherit;
+  line-height: normal;
+  -webkit-font-smoothing: inherit;
+  color: #0fa2e2;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+@mixin login-input {
+  width: $fullPrecent;
+  height: 40px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  padding: 6px 12px;
+  font-size: 16px;
+  color: #555;
+  outline: none;
+
+  &:focus {
+    border-color: $link-color;
+  }
+
+  &::placeholder {
+    font-family: roboto-thin;
+  }
+}
+
+@mixin btn {
+  color: $main-bgc-white;
+  background-color: $btn-blue;
+  border: 0;
+  padding: 7px;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &.clean {
+    color: $main-color;
+    background-color: transparent;
+  }
+}
+
+@mixin input {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: 1px solid #c3c6d4;
+}
+
+@mixin absoluteCenter {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@mixin line-elipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin left-border {
+  // position: relative;
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: 6px;
+  height: 100%;
+  overflow: hidden;
+  will-change: width;
+  border: none;
+}
+
+@mixin triangle-animation($width) {
+  border-bottom: $width solid rgba(0, 0, 0, 0.4);
+  border-right: $width solid transparent;
+}
+
+@mixin status-layout {
+  line-height: 35px;
+  font-size: 14px;
+  height: 36px;
+  min-width: rem(139.33px);
+  text-align: center;
+}
+
+@mixin person-layout {
+  line-height: 35px;
+  font-size: 14px;
+  height: 36px;
+  min-width: rem(97px);
+}
+
+@mixin date-layout {
+  line-height: 38px;
+
+  font-size: 14px;
+  height: 36px;
+  min-width: rem(139.33px);
+}
+
+@mixin left-bottom-right-border {
+  border-right: $border-cell;
+  border-top: $border-cell;
+  border-bottom: $border-cell;
+}
+
+@mixin right-bottom-border {
+  border-bottom: $border-cell;
+  border-right: $border-cell;
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin side-bar-btn {
+  // border: none;
+  position: relative;
+  background-color: $main-bgc-white;
+  border-radius: 20px;
+  border: $border-cell;
+  line-height: 22.5px;
+  top: 21px;
+  transition: .1s;
+  // cursor: pointer;
+  // padding: 5px 7px 5px 5px;
+  width: 26px;
+  height: 24px;
+  // transition: ;
+
+  .icon_component {
+    font-family: figtree-regular;
+    top: 2px;
+    border: none;
+  }
+
+  &:hover {
+    color: $main-bgc-white;
+    background-color: #0073ea;
+    width: 35px;
+  }
+}
+
+@mixin side-bar-btn-hover {
+
+  // border-radius: 20px;
+}
+
+@mixin spacer {
+  border-bottom: 1px solid $cell-border-color;
+  margin: 0 auto;
+  width: 100%;
+}
+
+@mixin left-sticky {
+  position: sticky;
+  z-index: 4;
+  left: 40px;
+}
+
+//not working on the render
+@mixin arrow-up-modal($num) {
+
+  position: absolute;
+  width: 0;
+  height: 0;
+  transform: translate(-50%, 0);
+  top: -9px;
+  left: $num;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 10px solid rgb(255, 255, 255);
+  border-color: $border-cell;
+
+}
