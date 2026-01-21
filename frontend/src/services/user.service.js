@@ -12,6 +12,7 @@ export const userService = {
     getById,
     remove,
     update,
+    approve,
     changeImage
 }
 
@@ -76,6 +77,16 @@ async function changeImage(img) {
     }
     catch (err) {
         console.error(err)
+    }
+}
+
+async function approve(userId) {
+    try {
+        const updated = await httpService.put(`user/${userId}/approve`, { approverId: getLoggedinUser()?._id || null })
+        return updated
+    } catch (err) {
+        console.error('Failed to approve user', err)
+        throw err
     }
 }
 

@@ -44,13 +44,13 @@ export function logout() {
 export function approveUser(userId) {
     return async (dispatch) => {
         try {
-            // backend endpoint to approve user is not implemented; placeholder
             const updated = await userService.approve(userId)
             dispatch({ type: APPROVE_USER, user: updated })
-            showSuccessMsg('User approved')
+            showSuccessMsg('User approved successfully')
             return updated
         } catch (err) {
-            showErrorMsg('Approve failed')
+            console.error('AuthActions: err in approveUser', err)
+            showErrorMsg('Cannot approve user')
             throw err
         }
     }
