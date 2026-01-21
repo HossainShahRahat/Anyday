@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom"
 import { useSelector } from 'react-redux';
 
 import { userService } from '../services/user.service.js'
+import { useDispatch } from 'react-redux'
+import { signupUser } from '../store/auth.actions'
 import { showErrorMsg, showSuccessMsg } from '../services/event-bus.service.js';
 
 import logo from '../assets/img/logo.png'
@@ -54,6 +56,7 @@ export function SignUp() {
         reader.readAsDataURL(file)
     }
 
+    const dispatch = useDispatch()
     async function onSignup(ev = null) {
         if (ev) ev.preventDefault()
         // basic validation
@@ -66,8 +69,7 @@ export function SignUp() {
             return
         }
         try {
-            const user = await userService.signup(credentials)
-            showSuccessMsg(`Welcome ${user.fullname}`)
+            await dispatch(signupUser(credentials))
             clearState()
             // navigate to first board if available
             if (boards && boards.length) navigate(`/board/${boards[0]._id}`)
