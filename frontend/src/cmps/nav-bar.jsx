@@ -24,6 +24,8 @@ export function NavBar() {
         setImgSrc(loggedInUser?.imgUrl)
     }, [loggedInUser])
 
+    const canApprove = loggedInUser && (loggedInUser.role === 'Founder' || loggedInUser.role === 'Co-Founder')
+
     async function onLogout() {
         try {
             await logout()
@@ -57,6 +59,16 @@ export function NavBar() {
                     <NavLink to='/board/'>< img className='nav-bar-board-logo' src={wm_icon} style={{ maxWidth: '30px' }} /></NavLink>
                 <div className='nav-bar-triangle'></div>
                 </div>
+                {canApprove && (
+                    <>
+                        <hr className='nav-logo-hr'/>
+                        <div className="nav-a-container">
+                            <NavLink to='/founder/approvals' title="User Approvals">
+                                <span style={{ fontSize: '14px', color: '#fff', padding: '8px', display: 'block' }}>✓ Approvals</span>
+                            </NavLink>
+                        </div>
+                    </>
+                )}
             </div>
             {getAvatarImg()}
             <hr  className='nav-user-hr'/>
