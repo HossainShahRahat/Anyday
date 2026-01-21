@@ -1,67 +1,70 @@
-const userService = require('./user.service')
-const logger = require('../../services/logger.service')
+const userService = require("./user.service");
+const logger = require("../../services/logger.service");
+const asyncLocalStorage = require("../../services/als.service");
 
 async function getUser(req, res) {
-    try {
-        const user = await userService.getById(req.params.id)
-        res.send(user)
-    } catch (err) {
-        logger.error('Failed to get user', err)
-        res.status(500).send({ err: 'Failed to get user' })
-    }
+  try {
+    const user = await userService.getById(req.params.id);
+    res.send(user);
+  } catch (err) {
+    logger.error("Failed to get user", err);
+    res.status(500).send({ err: "Failed to get user" });
+  }
 }
 
 async function getUsers(req, res) {
-    try {
-        const filterBy = {
-            txt: req.query?.txt || '',
-            minBalance: +req.query?.minBalance || 0
-        }
-        const users = await userService.query(filterBy)
-        res.send(users)
-    } catch (err) {
-        logger.error('Failed to get users', err)
-        res.status(500).send({ err: 'Failed to get users' })
-    }
+  try {
+    const filterBy = {
+      txt: req.query?.txt || "",
+      minBalance: +req.query?.minBalance || 0,
+    };
+    const users = await userService.query(filterBy);
+    res.send(users);
+  } catch (err) {
+    logger.error("Failed to get users", err);
+    res.status(500).send({ err: "Failed to get users" });
+  }
 }
 
 async function deleteUser(req, res) {
-    try {
-        await userService.remove(req.params.id)
-        res.send({ msg: 'Deleted successfully' })
-    } catch (err) {
-        logger.error('Failed to delete user', err)
-        res.status(500).send({ err: 'Failed to delete user' })
-    }
+  try {
+    await userService.remove(req.params.id);
+    res.send({ msg: "Deleted successfully" });
+  } catch (err) {
+    logger.error("Failed to delete user", err);
+    res.status(500).send({ err: "Failed to delete user" });
+  }
 }
 
 async function updateUser(req, res) {
-    try {
-        const user = req.body
-        const savedUser = await userService.update(user)
-        res.send(savedUser)
-    } catch (err) {
-        logger.error('Failed to update user', err)
-        res.status(500).send({ err: 'Failed to update user' })
-    }
+  try {
+    const user = req.body;
+    const savedUser = await userService.update(user);
+    res.send(savedUser);
+  } catch (err) {
+    logger.error("Failed to update user", err);
+    res.status(500).send({ err: "Failed to update user" });
+  }
 }
 
 async function approveUser(req, res) {
-    try {
-        const userId = req.params.id
-        // in a real app, use req.user from auth middleware to get approverId
-        const approverId = req.body.approverId || null
-        const updated = await userService.approve(userId, approverId)
-        res.send(updated)
-    } catch (err) {
-        logger.error('Failed to approve user', err)
-        res.status(500).send({ err: 'Failed to approve user' })
-    }
+  try {
+    const userId = req.params.id;
+    const { loggedinUser } = asyncLocalStorage.getStore();
+    // approverId comes from authenticated user (guaranteed by requireAuth + requireFounderOrCoFounder middleware)
+    const approverId = loggedinUser?._id || null;
+    const updated = await userService.approve(userId, approverId);
+    res.send(updated);
+  } catch (err) {
+    logger.error("Failed to approve user", err);
+    res.status(500).send({ err: "Failed to approve user" });
+  }
 }
 
 module.exports = {
-    getUser,
-    getUsers,
-    deleteUser,
-    updateUser
-}
+  getUser,
+  getUsers,
+  deleteUser,
+  updateUser,
+  approveUser,
+};

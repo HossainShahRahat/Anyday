@@ -38,39 +38,39 @@ export function DynamicModal({ cmp, setIsModalOpen, onUpdateTaskLabel }) {
       const users = await userService.getUsers();
       setUsers(Array.isArray(users) ? users : []);
     } catch (err) {
-      setUsers([])
+      setUsers([]);
     }
   }
 
   function getDate(date) {
-  setIsModalOpen(false);
-  const data = cmp?.data ? { ...cmp.data } : {}
-  const ts = date ? dayjs(date).unix() : null
-  onUpdateTaskLabel(UPDATE_TASK_DATE, data, ts);
+    setIsModalOpen(false);
+    const data = cmp?.data ? { ...cmp.data } : {};
+    const ts = date ? dayjs(date).unix() : null;
+    onUpdateTaskLabel(UPDATE_TASK_DATE, data, ts);
   }
 
   function onStatusPick(status) {
-  const data = cmp?.data ? { ...cmp.data } : {}
-  onUpdateTaskLabel(UPDATE_TASK_STATUS, data, status);
+    const data = cmp?.data ? { ...cmp.data } : {};
+    onUpdateTaskLabel(UPDATE_TASK_STATUS, data, status);
   }
 
   function onPriorityPick(priority) {
-    const data = cmp?.data ? { ...cmp.data } : {}
+    const data = cmp?.data ? { ...cmp.data } : {};
     onUpdateTaskLabel(UPDATE_TASK_PRIORITY, data, priority);
   }
   function onLabelStatusPick(labelStatus) {
-    const data = cmp?.data ? { ...cmp.data } : {}
+    const data = cmp?.data ? { ...cmp.data } : {};
     onUpdateTaskLabel(UPDATE_TASK_LABEL_STATUS, data, labelStatus);
   }
 
   function onMemberPick(user, isDelete = false) {
-    const data = cmp?.data ? { ...cmp.data, isDelete } : { isDelete }
+    const data = cmp?.data ? { ...cmp.data, isDelete } : { isDelete };
     onUpdateTaskLabel(UPDATE_TASK_MEMBERS, data, user);
     setIsModalOpen(false);
   }
 
   // Defensive: if cmp or type is missing, render nothing
-  if (!cmp || !cmp.type) return null
+  if (!cmp || !cmp.type) return null;
 
   switch (cmp.type) {
     case STATUS_PICKER:
@@ -78,7 +78,11 @@ export function DynamicModal({ cmp, setIsModalOpen, onUpdateTaskLabel }) {
         <div
           onClick={() => setIsModalOpen(false)}
           className="status-picker-container"
-          style={{ left: (cmp.pos && cmp.pos.left) || 0, top: (cmp.pos && cmp.pos.top) || 0, position: "absolute" }}
+          style={{
+            left: (cmp.pos && cmp.pos.left) || 0,
+            top: (cmp.pos && cmp.pos.top) || 0,
+            position: "absolute",
+          }}
         >
           <div className="arrow-up arrow-up-modal"></div>
           <div className="status-picker-view">
@@ -102,7 +106,11 @@ export function DynamicModal({ cmp, setIsModalOpen, onUpdateTaskLabel }) {
         <div
           onClick={() => setIsModalOpen(false)}
           className="status-picker-container"
-          style={{ left: (cmp.pos && cmp.pos.left) || 0, top: (cmp.pos && cmp.pos.top) || 0, position: "absolute" }}
+          style={{
+            left: (cmp.pos && cmp.pos.left) || 0,
+            top: (cmp.pos && cmp.pos.top) || 0,
+            position: "absolute",
+          }}
         >
           <div className="arrow-up arrow-up-modal"></div>
           <div className="status-picker-view">
@@ -125,7 +133,11 @@ export function DynamicModal({ cmp, setIsModalOpen, onUpdateTaskLabel }) {
       return (
         <div
           className="member-picker-view"
-          style={{ left: (cmp.pos && cmp.pos.left) || 0, top: (cmp.pos && cmp.pos.top) || 0, position: "absolute" }}
+          style={{
+            left: (cmp.pos && cmp.pos.left) || 0,
+            top: (cmp.pos && cmp.pos.top) || 0,
+            position: "absolute",
+          }}
         >
           <div className="members-dropdown">
             <DialogContentContainer className="monday-style-story-chips_search-bar">
@@ -139,7 +151,10 @@ export function DynamicModal({ cmp, setIsModalOpen, onUpdateTaskLabel }) {
                   iconSize={18}
                 />
                 <div className="member-picker-user-delete-container">
-                  {(cmp.info && Array.isArray(cmp.info.members) ? cmp.info.members : []).map((member) => (
+                  {(cmp.info && Array.isArray(cmp.info.members)
+                    ? cmp.info.members
+                    : []
+                  ).map((member) => (
                     <div
                       className="member-picker-user-delete"
                       key={member._id || Math.random()}
@@ -197,7 +212,11 @@ export function DynamicModal({ cmp, setIsModalOpen, onUpdateTaskLabel }) {
       return (
         <div
           className="date-picker-view"
-          style={{ left: (cmp.pos && cmp.pos.left) || 0, top: (cmp.pos && cmp.pos.top) || 0, position: "absolute" }}
+          style={{
+            left: (cmp.pos && cmp.pos.left) || 0,
+            top: (cmp.pos && cmp.pos.top) || 0,
+            position: "absolute",
+          }}
         >
           <div className="arrow-up arrow-up-modal"></div>
           <DialogContentContainer
@@ -232,6 +251,6 @@ export function DynamicModal({ cmp, setIsModalOpen, onUpdateTaskLabel }) {
         </div>
       );
     default:
-      return null
+      return null;
   }
 }
