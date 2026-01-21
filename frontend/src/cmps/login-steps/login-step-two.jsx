@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom"
 import { useSelector } from 'react-redux';
 
-import { userService } from '../../services/user.service.js'
-import { showSuccessMsg } from '../../services/event-bus.service.js';
+import { useDispatch } from 'react-redux'
+import { loginUser } from '../../store/auth.actions'
 
 import { Icon } from 'monday-ui-react-core';
 import { MoveArrowRight } from 'monday-ui-react-core/icons';
@@ -23,17 +23,17 @@ export function LoginStepTwo({ props }) {
         setLoginCredentials(prevMail => ({ ...prevMail, [field]: value }))
     }
 
+    const dispatch = useDispatch()
     async function onSubmitLogin(ev) {
         ev.preventDefault()
         const valid = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
         if (loginCredentials.email.match(valid)) {
             try {
-                const user = await userService.login(loginCredentials)
-                showSuccessMsg(`Welcome ${user.fullname}`)
+                const user = await dispatch(loginUser(loginCredentials))
                 clearState()
                 navigate(`/board/${boards[0]._id}`)
             } catch (err) {
-                console.log('err:',err)
+                console.log('err:', err)
             }
         }
     }

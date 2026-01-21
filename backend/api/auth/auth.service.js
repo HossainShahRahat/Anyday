@@ -16,7 +16,9 @@ async function login(email, password, isSocialMedia) {
 
     const user = await userService.getByUsername(email)
     if (!user) return Promise.reject('Invalid email or password')
-    // TODO: un-comment for real login
+    // If user is not approved, reject login (unless Founder or approved)
+    if (user.role !== 'Founder' && !user.approved) return Promise.reject('User not approved')
+    // Check password for non-social logins
     if (!isSocialMedia) {
         const match = await bcrypt.compare(password, user.password)
         if (!match) return Promise.reject('Invalid email or password')
@@ -36,7 +38,10 @@ async function signup({ email, password, fullname, imgUrl }) {
     if (userExist) return Promise.reject('Username already taken')
 
     const hash = await bcrypt.hash(password, saltRounds)
-    return userService.add({ email, password: hash, fullname, imgUrl })
+    // New signups default to Employee role and require approval unless specified
+    const userToSave = { email, password: hash, fullname, imgUrl }
+    // Service layer will set defaults for role/approved
+    return userService.add(userToSave)
 }
 
 function getLoginToken(user) {

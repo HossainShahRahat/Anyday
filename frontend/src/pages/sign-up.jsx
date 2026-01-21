@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom"
 import { useSelector } from 'react-redux';
 
 import { userService } from '../services/user.service.js'
+import { useDispatch } from 'react-redux'
+import { signupUser } from '../store/auth.actions'
 import { showErrorMsg, showSuccessMsg } from '../services/event-bus.service.js';
 
 import logo from '../assets/img/logo.png'
@@ -14,8 +16,9 @@ import { MoveArrowRight } from 'monday-ui-react-core/icons';
 
 export function SignUp() {
     const boards = useSelector((storeState) => storeState.boardModule.boards)
-    const [credentials, setCredentials] = useState({ email: '', username: '', password: '', fullname: '', imgUrl: '' })
+    const [credentials, setCredentials] = useState({ email: '', username: '', password: '', confirmPassword: '', fullname: '', imgUrl: '', companyName: '', role: 'Employee', address: '' })
     const navigate = useNavigate()
+    const [isNewCompany, setIsNewCompany] = useState(false)
 
     function clearState() {
         setCredentials({ email: '', username: '', password: '', fullname: '', imgUrl: '' })
@@ -27,17 +30,54 @@ export function SignUp() {
         setCredentials({ ...credentials, [field]: value })
     }
 
+    async function checkCompanyExists(companyName) {
+        if (!companyName) {
+            setIsNewCompany(false)
+            return
+        }
+        try {
+            const users = await userService.getUsers()
+            const exists = users.some(u => u.companyName && u.companyName.toLowerCase() === companyName.toLowerCase())
+            setIsNewCompany(!exists)
+            // if company is new, force Founder role
+            if (!exists) setCredentials(prev => ({ ...prev, role: 'Founder' }))
+        } catch (err) {
+            console.error('Failed checking company existence', err)
+        }
+    }
+
+    async function onImageChange(ev) {
+        const file = ev.target.files[0]
+        if (!file) return
+        const reader = new FileReader()
+        reader.onloadend = () => {
+            setCredentials({ ...credentials, imgUrl: reader.result })
+        }
+        reader.readAsDataURL(file)
+    }
+
+    const dispatch = useDispatch()
     async function onSignup(ev = null) {
         if (ev) ev.preventDefault()
-        if (!credentials.email || !credentials.password || !credentials.fullname) return
+        // basic validation
+        if (!credentials.email || !credentials.password || !credentials.fullname) {
+            showErrorMsg('Please fill required fields')
+            return
+        }
+        if (credentials.password !== credentials.confirmPassword) {
+            showErrorMsg('Passwords do not match')
+            return
+        }
         try {
-            const user = await userService.signup(credentials)
-            showSuccessMsg(`Welcome ${user.fullname}`)
+            await dispatch(signupUser(credentials))
             clearState()
-            navigate(`/board/${boards[0]._id}`)
+            // navigate to first board if available
+            if (boards && boards.length) navigate(`/board/${boards[0]._id}`)
+            else navigate('/')
         }
         catch (err) {
-            console.log('error: ',err)
+            console.log('error: ', err)
+            showErrorMsg('Signup failed')
         }
     }
 
@@ -90,6 +130,47 @@ export function SignUp() {
                                         name="password"
                                         className="password-input"
                                         placeholder="Password" required />
+                                </div>
+                            </div>
+
+                            <div className="form-input-container">
+                                <span className="email-password-label">Company</span>
+                                <div className="company-input-container">
+                                    <input
+                                        onChange={handleChange}
+                                        onBlur={(e) => checkCompanyExists(e.target.value)}
+                                        id="companyName"
+                                        type="text"
+                                        name="companyName"
+                                        className="company-input"
+                                        placeholder="Company name (optional)" />
+                                </div>
+                            </div>
+
+                            <div className="form-input-container">
+                                <span className="email-password-label">Role</span>
+                                <div className="role-select-container">
+                                    <select name="role" value={credentials.role} onChange={handleChange}>
+                                        {isNewCompany ? (
+                                            <>
+                                                <option value="Founder">Founder</option>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <option value="Founder">Founder</option>
+                                                <option value="Co-Founder">Co-Founder</option>
+                                                <option value="Employee">Employee</option>
+                                            </>
+                                        )}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="form-input-container">
+                                <span className="email-password-label">Profile image</span>
+                                <div className="image-input-container">
+                                    <input type="file" accept="image/*" onChange={onImageChange} />
+                                    {credentials.imgUrl && <img src={credentials.imgUrl} alt="preview" style={{width:80,height:80,objectFit:'cover',marginTop:8}} />}
                                 </div>
                             </div>
                             <div className="next-btn-wrapper">

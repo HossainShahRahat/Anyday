@@ -82,13 +82,33 @@ async function update(user) {
     }
 }
 
+async function approve(userId, approverId = null) {
+    try {
+        const collection = await dbService.getCollection('user')
+        const update = { $set: { approved: true, approvedBy: approverId } }
+        await collection.updateOne({ _id: ObjectId(userId) }, update)
+        const saved = await getById(userId)
+        return saved
+    } catch (err) {
+        logger.error(`cannot approve user ${userId}`, err)
+        throw err
+    }
+}
+
 async function add(user) {
     try {
+        // Normalize fields and include optional auth/profile metadata
         const userToAdd = {
             email: user.email,
             password: user.password,
-            fullname: user.fullname,
-            imgUrl: user.imgUrl,
+            fullname: user.fullname || user.fullName || '',
+            username: user.userName || user.username || '',
+            imgUrl: user.imgUrl || user.profileImage || '',
+            address: user.address || '',
+            companyName: user.companyName || '',
+            role: user.role || 'Employee',
+            approved: typeof user.approved === 'boolean' ? user.approved : false,
+            approvedBy: user.approvedBy || null
         }
         const collection = await dbService.getCollection('user')
         await collection.insertOne(userToAdd)
