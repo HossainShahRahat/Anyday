@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 import { useSelector } from "react-redux";
 
 import { userService } from "../services/user.service.js";
 import { useDispatch } from "react-redux";
 import { signupUser } from "../store/auth.actions";
-import { showErrorMsg, showSuccessMsg } from "../services/event-bus.service.js";
+import { showErrorMsg } from "../services/event-bus.service.js";
 
 import logo from "../assets/img/logo.png";
 
@@ -35,9 +36,14 @@ export function SignUp() {
       email: "",
       username: "",
       password: "",
+      confirmPassword: "",
       fullname: "",
       imgUrl: "",
+      companyName: "",
+      role: "Employee",
+      address: "",
     });
+    setIsNewCompany(false);
   }
 
   function handleChange(ev) {
@@ -80,8 +86,8 @@ export function SignUp() {
   async function onSignup(ev = null) {
     if (ev) ev.preventDefault();
     // basic validation
-    if (!credentials.email || !credentials.password || !credentials.fullname) {
-      showErrorMsg("Please fill required fields");
+    if (!credentials.email || !credentials.password || !credentials.fullname || !credentials.companyName) {
+      showErrorMsg("Please fill all required fields");
       return;
     }
     if (credentials.password !== credentials.confirmPassword) {
@@ -91,7 +97,23 @@ export function SignUp() {
     try {
       await dispatch(signupUser(credentials));
       clearState();
-      // navigate to first board if available
+      
+      // Show success toast with longer duration
+      toast.success("🎉 Account created successfully! Welcome to Anyday!", {
+        position: "top-center",
+        autoClose: 6000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        style: {
+          fontSize: '16px',
+          padding: '16px',
+        }
+      });
+      
+      // Navigate to first board if available
       if (boards && boards.length) navigate(`/board/${boards[0]._id}`);
       else navigate("/");
     } catch (err) {
@@ -143,7 +165,7 @@ export function SignUp() {
                     id="fullname"
                     type="text"
                     name="fullname"
-                    className="name-input"
+                    className="password-input"
                     placeholder="Full name"
                     required
                   />
@@ -165,27 +187,45 @@ export function SignUp() {
               </div>
 
               <div className="form-input-container">
+                <span className="email-password-label">Confirm Password</span>
+                <div className="password-input-container">
+                  <input
+                    onChange={handleChange}
+                    id="confirmPassword"
+                    type="password"
+                    name="confirmPassword"
+                    className="password-input"
+                    placeholder="Confirm password"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="form-input-container">
                 <span className="email-password-label">Company</span>
-                <div className="company-input-container">
+                <div className="password-input-container">
                   <input
                     onChange={handleChange}
                     onBlur={(e) => checkCompanyExists(e.target.value)}
                     id="companyName"
                     type="text"
                     name="companyName"
-                    className="company-input"
-                    placeholder="Company name (optional)"
+                    className="password-input"
+                    placeholder="Company name"
+                    required
                   />
                 </div>
               </div>
 
               <div className="form-input-container">
                 <span className="email-password-label">Role</span>
-                <div className="role-select-container">
+                <div className="password-input-container">
                   <select
                     name="role"
                     value={credentials.role}
                     onChange={handleChange}
+                    className="password-input"
+                    style={{ appearance: 'auto', cursor: 'pointer' }}
                   >
                     {isNewCompany ? (
                       <>

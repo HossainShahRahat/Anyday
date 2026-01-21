@@ -32,15 +32,9 @@ async function getById(userId) {
   try {
     const collection = await dbService.getCollection("user");
     const user = await collection.findOne({ _id: ObjectId(userId) });
+    if (!user) return null;
     delete user.password;
-    user.givenReviews = await reviewService.query({
-      byUserId: ObjectId(user._id),
-    });
-    user.givenReviews = user.givenReviews.map((review) => {
-      delete review.byUser;
-      return review;
-    });
-
+    // Removed reviewService reference - not needed
     return user;
   } catch (err) {
     logger.error(`while finding user by id: ${userId}`, err);
@@ -71,7 +65,13 @@ async function remove(userId) {
 async function update(user) {
   try {
     const prevUser = await getById(user._id);
-    prevUser.imgUrl = user.imgUrl;
+    // Update allowed fields
+    if (user.fullname !== undefined) prevUser.fullname = user.fullname;
+    if (user.imgUrl !== undefined) prevUser.imgUrl = user.imgUrl;
+    if (user.email !== undefined) prevUser.email = user.email;
+    if (user.address !== undefined) prevUser.address = user.address;
+    if (user.companyName !== undefined) prevUser.companyName = user.companyName;
+    // Note: role and password should be updated through separate endpoints for security
     const userToSave = prevUser;
     const collection = await dbService.getCollection("user");
     await collection.updateOne({ _id: userToSave._id }, { $set: userToSave });
@@ -98,6 +98,10 @@ async function approve(userId, approverId = null) {
 async function add(user) {
   try {
     // Normalize fields and include optional auth/profile metadata
+    const role = user.role || "Employee";
+    // Founders are auto-approved, others need approval
+    const isApproved = role === "Founder";
+    
     const userToAdd = {
       email: user.email,
       password: user.password,
@@ -106,9 +110,9 @@ async function add(user) {
       imgUrl: user.imgUrl || user.profileImage || "",
       address: user.address || "",
       companyName: user.companyName || "",
-      role: user.role || "Employee",
-      approved: typeof user.approved === "boolean" ? user.approved : false,
-      approvedBy: user.approvedBy || null,
+      role: role,
+      approved: isApproved,
+      approvedBy: isApproved ? null : user.approvedBy || null,
     };
     const collection = await dbService.getCollection("user");
     await collection.insertOne(userToAdd);

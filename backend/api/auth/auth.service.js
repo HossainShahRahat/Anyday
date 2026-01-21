@@ -54,6 +54,7 @@ function getLoginToken(user) {
     fullname: user.fullname,
     isAdmin: user.isAdmin,
     role: user.role,
+    companyName: user.companyName || null,
   };
   return cryptr.encrypt(JSON.stringify(userInfo));
 }

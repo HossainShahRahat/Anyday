@@ -22,39 +22,13 @@
   cursor: pointer;
   padding: 7px;
 
-  &.dev {
-    svg {
-      color: rgb(0, 200, 117);
-    }
-    &:hover {
-      border-color: rgb(0, 200, 117);
-    }
+  svg {
+    color: rgb(87, 155, 252);
   }
-
-  &.marketing {
-    svg {
-      color: rgb(240, 64, 149);
-    }
-    &:hover {
-      border-color: rgb(240, 64, 149);
-    }
-  }
-
-  &.PRM {
-    svg {
-      color: rgb(255, 153, 0);
-    }
-    &:hover {
-      border-color: rgb(255, 153, 0);
-    }
-  }
-
-  &.CRM {
-    svg {
-      color: rgb(0, 210, 210);
-    }
-    &:hover {
-      border-color: rgb(0, 210, 210);
-    }
+  
+  &:hover {
+    border-color: rgb(87, 155, 252);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(87, 155, 252, 0.2);
   }
 }

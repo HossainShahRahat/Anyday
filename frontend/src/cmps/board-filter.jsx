@@ -9,22 +9,26 @@ import { utilService } from '../services/util.service';
 import { StatusModal } from './filter-modals/status-filter';
 import { PriorityModal } from './filter-modals/priority-modal';
 import { LabelModal } from './filter-modals/label-status-modal';
-import { faMicrophone } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { MyAnnie } from '../pages/MyAnnie';
 
 export function BoardFilter({ board, onSetFilterBy }) {
 
     const [filterBy, setfilterBy] = useState(boardService.getDefaultFilter())
     const [isFilterModalOpen, setIsFilterModalOpen] = useState()
     const [isInputFocused, setIsInputFocused] = useState(false)
-    const [isAnnieOn, setisAnnieOn] = useState(false)
 
-    onSetFilterBy = useRef(utilService.debounce(onSetFilterBy))
+    const debouncedOnSetFilterBy = useRef(null);
+
+    // Initialize debounced function only once
+    useEffect(() => {
+        if (onSetFilterBy && typeof onSetFilterBy === 'function') {
+            debouncedOnSetFilterBy.current = utilService.debounce(onSetFilterBy, 300);
+        }
+    }, [onSetFilterBy]);
 
     useEffect(() => {
-
-        onSetFilterBy.current(filterBy)
+        if (debouncedOnSetFilterBy.current && typeof debouncedOnSetFilterBy.current === 'function') {
+            debouncedOnSetFilterBy.current(filterBy);
+        }
     }, [filterBy]);
 
     function onAddNewTask() {
@@ -58,21 +62,10 @@ export function BoardFilter({ board, onSetFilterBy }) {
         setfilterBy(prev => ({ ...prev, [field]: value }))
     }
     return <Fragment>
-        <MyAnnie
-            setisAnnieOn={setisAnnieOn}
-            board={board}
-            setfilterBy={setfilterBy}
-            isAnnieOn={isAnnieOn}
-        />
         <section className='board-filter'>
             <Flex gap='10' align='End'
 
             >
-                <div className='annie-icon-header' onClick={() => setisAnnieOn(!isAnnieOn)}>
-                    <FontAwesomeIcon className='open-annie-mic' icon={faMicrophone} style={{ 
-                        height: '25px',
-                        color: isAnnieOn ? '#F52918' : '#676879' }} />
-                </div>
                 <SplitButton className="new-task-btn"
 
                     children='New Item' size={Button.sizes.SMALL} onClick={onAddNewTask} secondaryDialogContent={<HeaderMenu board={board} />} >

@@ -31,9 +31,17 @@ function remove(userId) {
   return httpService.delete(`user/${userId}`);
 }
 
-async function update({ _id, imgUrl }) {
-  const user = await httpService.put(`user/${_id}`, { _id, imgUrl });
-  if (getLoggedinUser()._id === user._id) saveLocalUser(user);
+async function update(userData) {
+  const { _id, fullname, imgUrl, email, address, companyName } = userData;
+  const user = await httpService.put(`user/${_id}`, { 
+    _id, 
+    fullname, 
+    imgUrl, 
+    email, 
+    address, 
+    companyName 
+  });
+  if (getLoggedinUser() && getLoggedinUser()._id === user._id) saveLocalUser(user);
   return user;
 }
 
@@ -43,10 +51,12 @@ async function login(userCred) {
     if (user) {
       return saveLocalUser(user);
     } else {
-      console.log("wrong pw or email");
+      throw new Error("Invalid email or password");
     }
   } catch (err) {
-    console.error(err);
+    // Re-throw with proper error message
+    const errorMsg = err.response?.data?.err || err.message || "Invalid email or password";
+    throw new Error(errorMsg);
   }
 }
 
@@ -90,7 +100,13 @@ async function approve(userId) {
 }
 
 function saveLocalUser(user) {
-  user = { _id: user._id, fullname: user.fullname, imgUrl: user.imgUrl, role: user.role };
+  user = { 
+    _id: user._id, 
+    fullname: user.fullname, 
+    imgUrl: user.imgUrl, 
+    role: user.role,
+    companyName: user.companyName 
+  };
   sessionStorage.setItem(STORAGE_KEY_LOGGEDIN_USER, JSON.stringify(user));
   return user;
 }

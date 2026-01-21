@@ -47,6 +47,23 @@ export async function loadBoard(boardId, filterBy) {
   try {
     const board = await boardService.getById(boardId, filterBy);
     store.dispatch({ type: SET_BOARD, board });
+    
+    // Track that the current user viewed this board
+    // This updates the lastSeenBy array in the database
+    try {
+      const updatedBoard = await boardService.trackView(boardId);
+      // Update the board in store with the latest data including lastSeenBy
+      if (updatedBoard) {
+        store.dispatch({ 
+          type: UPDATE_BOARD, 
+          board: updatedBoard 
+        });
+      }
+    } catch (err) {
+      // Silently fail if tracking fails - don't break board loading
+      console.log("Failed to track board view:", err);
+    }
+    
     return board;
   } catch (err) {
     console.log("Cannot load board", err);
@@ -54,14 +71,16 @@ export async function loadBoard(boardId, filterBy) {
   }
 }
 
-export async function loadBoards() {
-  try {
-    const boards = await boardService.query();
-    store.dispatch({ type: SET_BOARDS, boards });
-  } catch (err) {
-    console.log("Cannot load boards", err);
-    throw err;
-  }
+export function loadBoards() {
+  return async (dispatch) => {
+    try {
+      const boards = await boardService.query();
+      dispatch({ type: SET_BOARDS, boards });
+    } catch (err) {
+      console.log("Cannot load boards", err);
+      throw err;
+    }
+  };
 }
 
 export async function duplicateBoard(board) {

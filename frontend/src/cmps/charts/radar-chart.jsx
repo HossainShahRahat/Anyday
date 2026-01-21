@@ -57,5 +57,7 @@ export const data = {
 };
 
 export function RadarChart({priorityData}) {
-  return <Radar data={data} />;
+  // Use provided priorityData if available, otherwise use default data
+  const chartData = priorityData || data;
+  return <Radar data={chartData} />;
 }

@@ -88,3 +88,18 @@ export async function updateUserImg(imgUrl) {
         throw err
     }
 }
+
+export async function updateUser(userData) {
+    try {
+        const updatedUser = await userService.update(userData)
+        const loggedInUser = userService.getLoggedinUser()
+        if (loggedInUser && loggedInUser._id === updatedUser._id) {
+            store.dispatch({ type: SET_USER, user: updatedUser })
+        }
+        store.dispatch({ type: SET_WATCHED_USER, user: updatedUser })
+        return updatedUser
+    } catch (err) {
+        console.error('Cannot update user:', err)
+        throw err
+    }
+}

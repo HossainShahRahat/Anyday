@@ -50,28 +50,36 @@ export function StatusesList({ status, board, provided }) {
             {status.label}
           </div>
           <div className="cards-container flex column">
-            {(safeBoard.groups || []).map((group) =>
-              (group.tasks || []).map((task, idx) =>
-                task && task.status === status.label ? (
-                  <Draggable draggableId={task.id} key={task.id} index={idx}>
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                      >
-                        <TaskCard
-                          task={task}
-                          group={group}
-                          board={safeBoard}
-                          snapshot={snapshot}
-                        />
-                      </div>
-                    )}
-                  </Draggable>
-                ) : null,
-              ),
-            )}
+            {(() => {
+              // Collect all tasks with matching status and create a flat array for proper indexing
+              const tasksForStatus = [];
+              (safeBoard.groups || []).forEach((group) => {
+                (group.tasks || []).forEach((task) => {
+                  if (task && task.status === status.label) {
+                    tasksForStatus.push({ task, group });
+                  }
+                });
+              });
+              
+              return tasksForStatus.map(({ task, group }, idx) => (
+                <Draggable draggableId={task.id} key={task.id} index={idx}>
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                    >
+                      <TaskCard
+                        task={task}
+                        group={group}
+                        board={safeBoard}
+                        snapshot={snapshot}
+                      />
+                    </div>
+                  )}
+                </Draggable>
+              ));
+            })()}
             {prov.placeholder}
           </div>
           <EditableHeading

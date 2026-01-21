@@ -10,9 +10,6 @@ function setupSocketAPI(http) {
     })
     gIo.on('connection', socket => {
         logger.info(`New connected socket [id: ${socket.id}]`)
-        socket.on('disconnect', socket => {
-            logger.info(`Socket disconnected [id: ${socket.id}]`)
-        })
         socket.on('chat-set-topic', topic => {
             if (socket.myTopic === topic) return
             if (socket.myTopic) {
@@ -39,6 +36,35 @@ function setupSocketAPI(http) {
         socket.on('unset-user-socket', () => {
             logger.info(`Removing socket.userId for socket [id: ${socket.id}]`)
             delete socket.userId
+        })
+
+        // Board presence tracking
+        socket.on('board-join', ({ boardId, user }) => {
+            if (socket.boardId) {
+                socket.leave(`board:${socket.boardId}`)
+            }
+            socket.join(`board:${boardId}`)
+            socket.boardId = boardId
+            // Broadcast to all users in the board room
+            socket.to(`board:${boardId}`).emit('board-users-updated', { type: 'join', user })
+            logger.info(`User ${user?.fullname || user?.userId} joined board ${boardId}`)
+        })
+
+        socket.on('board-leave', ({ boardId, user }) => {
+            socket.leave(`board:${boardId}`)
+            socket.to(`board:${boardId}`).emit('board-users-updated', { type: 'leave', user })
+            delete socket.boardId
+            logger.info(`User ${user?.fullname || user?.userId} left board ${boardId}`)
+        })
+
+        socket.on('disconnect', () => {
+            if (socket.boardId) {
+                socket.to(`board:${socket.boardId}`).emit('board-users-updated', { 
+                    type: 'leave', 
+                    user: { userId: socket.userId } 
+                })
+            }
+            logger.info(`Socket disconnected [id: ${socket.id}]`)
         })
 
     })

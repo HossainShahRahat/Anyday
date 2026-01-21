@@ -13,7 +13,7 @@ import { ImgUploader } from '../cmps/img-uploader'
 import { userService } from '../services/user.service'
 
 import { Icon } from 'monday-ui-react-core'
-import { Gallery } from 'monday-ui-react-core/icons'
+import { Gallery, DoubleCheck, Board } from 'monday-ui-react-core/icons'
 
 export function NavBar() {
     const [toggleUserModal, setToggleUserModal] = useState('none')
@@ -52,19 +52,39 @@ export function NavBar() {
         <nav>
             <div>
                 <div className="nav-a-container">
-                    <NavLink to='/'><img className='nav-bar-logo' src={logo} style={{ minWidth: '55px' }} /></NavLink>
+                    <NavLink to='/'><img className='nav-bar-logo' src={logo} /></NavLink>
                 </div>
                 <hr  className='nav-logo-hr'/>
                 <div className="nav-a-container">
-                    <NavLink to='/board/'>< img className='nav-bar-board-logo' src={wm_icon} style={{ maxWidth: '30px' }} /></NavLink>
-                <div className='nav-bar-triangle'></div>
+                    <NavLink to='/board' end={false}>
+                        <img className='nav-bar-board-logo' src={wm_icon} />
+                        <div className='nav-bar-triangle'></div>
+                    </NavLink>
                 </div>
                 {canApprove && (
                     <>
                         <hr className='nav-logo-hr'/>
                         <div className="nav-a-container">
                             <NavLink to='/founder/approvals' title="User Approvals">
-                                <span style={{ fontSize: '14px', color: '#fff', padding: '8px', display: 'block' }}>✓ Approvals</span>
+                                <Icon 
+                                    iconType={Icon.type.SVG} 
+                                    icon={DoubleCheck} 
+                                    iconSize={32} 
+                                    style={{ color: '#fff' }}
+                                />
+                                <div className='nav-bar-triangle'></div>
+                            </NavLink>
+                        </div>
+                        <hr className='nav-logo-hr'/>
+                        <div className="nav-a-container">
+                            <NavLink to='/founder/board-assignment' title="Assign Boards to Employees">
+                                <Icon 
+                                    iconType={Icon.type.SVG} 
+                                    icon={Board} 
+                                    iconSize={32} 
+                                    style={{ color: '#fff' }}
+                                />
+                                <div className='nav-bar-triangle'></div>
                             </NavLink>
                         </div>
                     </>

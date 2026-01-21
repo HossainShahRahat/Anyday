@@ -1,5 +1,6 @@
 const boardService = require('./board.service.js')
 const logger = require('../../services/logger.service')
+const asyncLocalStorage = require('../../services/als.service')
 
 async function getBoards(req, res) {
   try {
@@ -7,7 +8,11 @@ async function getBoards(req, res) {
     const filterBy = {
       title: req.query.title || ''
     }
-    const boards = await boardService.query(filterBy)
+    
+    // Get logged-in user from asyncLocalStorage for role-based filtering
+    const { loggedinUser } = asyncLocalStorage.getStore() || {}
+    
+    const boards = await boardService.query(filterBy, loggedinUser)
     res.json(boards)
   } catch (err) {
     logger.error('Failed to get boards', err)
@@ -18,7 +23,14 @@ async function getBoards(req, res) {
 async function getBoardById(req, res) {
   try {
     const boardId = req.params.id
-    const board = await boardService.getById(boardId)
+    const { loggedinUser } = asyncLocalStorage.getStore() || {}
+    
+    const board = await boardService.getById(boardId, loggedinUser)
+    
+    if (!board) {
+      return res.status(403).send({ err: 'Access denied to this board' })
+    }
+    
     res.json(board)
   } catch (err) {
     logger.error('Failed to get board', err)
@@ -27,11 +39,27 @@ async function getBoardById(req, res) {
 }
 
 async function addBoard(req, res) {
-  const { loggedinUser } = req
+  const { loggedinUser } = asyncLocalStorage.getStore() || {}
 
   try {
     const board = req.body
     board.owner = loggedinUser
+    
+    // Set company info from logged-in user
+    if (loggedinUser && loggedinUser.companyName) {
+      board.companyName = loggedinUser.companyName
+    }
+    
+    // Set default visibility if not provided
+    if (!board.visibility) {
+      board.visibility = 'public'
+    }
+    
+    // Initialize allowedUsers array if not provided
+    if (!board.allowedUsers) {
+      board.allowedUsers = []
+    }
+    
     const addedBoard = await boardService.add(board)
     res.json(addedBoard)
   } catch (err) {
@@ -96,6 +124,23 @@ async function removeBoardMsg(req, res) {
   }
 }
 
+async function trackBoardView(req, res) {
+  try {
+    const boardId = req.params.id
+    const { loggedinUser } = asyncLocalStorage.getStore() || {}
+    
+    if (!loggedinUser) {
+      return res.status(401).send({ err: 'Not authenticated' })
+    }
+    
+    const updatedBoard = await boardService.trackView(boardId, loggedinUser)
+    res.json(updatedBoard)
+  } catch (err) {
+    logger.error('Failed to track board view', err)
+    res.status(500).send({ err: 'Failed to track board view' })
+  }
+}
+
 module.exports = {
   getBoards,
   getBoardById,
@@ -103,5 +148,6 @@ module.exports = {
   updateBoard,
   removeBoard,
   addBoardMsg,
-  removeBoardMsg
+  removeBoardMsg,
+  trackBoardView
 }

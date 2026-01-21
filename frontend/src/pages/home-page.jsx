@@ -1,11 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { loadBoards } from "../store/board.actions";
+import { logout } from "../store/user.actions";
+import { userService } from "../services/user.service";
+import { showErrorMsg } from "../services/event-bus.service";
 
-import { Icon, Loader } from "monday-ui-react-core";
-import { MoveArrowRight, LogIn } from "monday-ui-react-core/icons";
+import { Icon, Loader, Menu, MenuItem } from "monday-ui-react-core";
+import { MoveArrowRight, LogIn, Edit, LogOut } from "monday-ui-react-core/icons";
 
 import logo from "../assets/img/logo.png";
 
@@ -17,22 +20,77 @@ import { Templates } from "../cmps/templates.jsx";
 export function HomePage() {
   const boards = useSelector((storeState) => storeState.boardModule.boards);
   const loggedInUser = useSelector((storeState) => storeState.userModule.user);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [imgSrc, setImgSrc] = useState(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    loadBoards();
+    async function fetchBoards() {
+      try {
+        setIsLoading(true);
+        await loadBoards();
+      } catch (err) {
+        console.error("Failed to load boards:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchBoards();
   }, []);
+
+  useEffect(() => {
+    const user = userService.getLoggedinUser();
+    if (user) {
+      setImgSrc(user.imgUrl);
+    }
+  }, [loggedInUser]);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (isMenuOpen && !event.target.closest('.home-page-user-profile')) {
+        setIsMenuOpen(false);
+      }
+    }
+    if (isMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [isMenuOpen]);
 
   function scrollTop() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  async function onLogout() {
+    try {
+      await logout();
+    } catch (err) {
+      showErrorMsg("Cannot logout");
+    }
+  }
+
+  function onEditProfile() {
+    const user = userService.getLoggedinUser();
+    if (user) {
+      navigate(`/user-details/${user._id}`);
+    }
+  }
+
   const safeBoards = Array.isArray(boards) ? boards : [];
-  if (!safeBoards.length)
+  
+  // Show loader only while actually loading, not when boards are empty
+  if (isLoading) {
     return (
       <div className="loader">
         <Loader size={Loader.sizes.LARGE} />
       </div>
     );
+  }
+  
   return (
     <section className="home-page">
       <header className="home-page-top-header" onClick={scrollTop}>
@@ -42,10 +100,66 @@ export function HomePage() {
         </div>
         <div className="home-page-login-signup-container">
           {loggedInUser ? (
-            <span className="home-page-login-signup-link">
-              {" "}
-              Welcome {loggedInUser.fullname}
-            </span>
+            <div className="home-page-user-profile" style={{ display: 'flex', alignItems: 'center', gap: '10px', position: 'relative' }}>
+              <div 
+                style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+              >
+                <img
+                  className="home-page-profile-img"
+                  src={imgSrc || 'https://static-00.iconduck.com/assets.00/profile-user-icon-256x256-zhsk04ey.png'}
+                  alt="Profile"
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    cursor: 'pointer',
+                    objectFit: 'cover'
+                  }}
+                />
+                <span 
+                  className="home-page-login-signup-link"
+                  style={{ cursor: 'pointer' }}
+                >
+                  {loggedInUser.fullname}
+                </span>
+              </div>
+              {isMenuOpen && (
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: '0',
+                  marginTop: '8px',
+                  backgroundColor: '#fff',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                  zIndex: 1000,
+                  minWidth: '180px',
+                  overflow: 'hidden'
+                }}>
+                  <Menu id="user-menu" size="medium">
+                    <MenuItem
+                      icon={Edit}
+                      iconType="SVG"
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        onEditProfile();
+                      }}
+                      title="Edit Profile"
+                    />
+                    <MenuItem
+                      icon={LogOut}
+                      iconType="SVG"
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        onLogout();
+                      }}
+                      title="Logout"
+                    />
+                  </Menu>
+                </div>
+              )}
+            </div>
           ) : (
             <span>
               <span className="home-page-login-signup-link"> Welcome!</span>
@@ -56,17 +170,31 @@ export function HomePage() {
             </span>
           )}
 
-          <Link
-            className="home-page-start-nav"
-            to={`/board/${safeBoards[0]._id}`}
-          >
-            Get Started
-            <Icon
-              iconType={Icon.type.SVG}
-              icon={MoveArrowRight}
-              iconSize={16}
-            />
-          </Link>
+          {safeBoards.length > 0 ? (
+            <Link
+              className="home-page-start-nav"
+              to={`/board/${safeBoards[0]._id}`}
+            >
+              Get Started
+              <Icon
+                iconType={Icon.type.SVG}
+                icon={MoveArrowRight}
+                iconSize={16}
+              />
+            </Link>
+          ) : !loggedInUser ? (
+            <Link
+              className="home-page-start-nav"
+              to="/signup"
+            >
+              Get Started
+              <Icon
+                iconType={Icon.type.SVG}
+                icon={MoveArrowRight}
+                iconSize={16}
+              />
+            </Link>
+          ) : null}
         </div>
       </header>
 
@@ -215,18 +343,33 @@ export function HomePage() {
         ✦
       </span>
       <div className="home-page-link">
-        <Link className="btn-get-started" to={`/board/${boards[0]._id}`}>
-          Get Started{" "}
-          <div className="btn-get-started-arrow-container">
-            <span className="btn-get-started-arrow">
-              <Icon
-                iconType={Icon.type.SVG}
-                icon={MoveArrowRight}
-                iconSize={18}
-              />
-            </span>
-          </div>{" "}
-        </Link>
+        {safeBoards.length > 0 ? (
+          <Link className="btn-get-started" to={`/board/${safeBoards[0]._id}`}>
+            Get Started{" "}
+            <div className="btn-get-started-arrow-container">
+              <span className="btn-get-started-arrow">
+                <Icon
+                  iconType={Icon.type.SVG}
+                  icon={MoveArrowRight}
+                  iconSize={18}
+                />
+              </span>
+            </div>{" "}
+          </Link>
+        ) : !loggedInUser ? (
+          <Link className="btn-get-started" to="/signup">
+            Get Started{" "}
+            <div className="btn-get-started-arrow-container">
+              <span className="btn-get-started-arrow">
+                <Icon
+                  iconType={Icon.type.SVG}
+                  icon={MoveArrowRight}
+                  iconSize={18}
+                />
+              </span>
+            </div>{" "}
+          </Link>
+        ) : null}
         <div className="home-page-promo">
           <span className="home-page-promo1">No credit needed</span>✦
           <span className="home-page-promo2">Unlimited time on Free plan</span>

@@ -78,13 +78,19 @@ export function GroupPreview({
   const [sortBy, setSortBy] = useState(boardService.getDefaultFilter() || {});
 
   const dispatch = useDispatch();
-  const onSetSortByRef = useRef(
-    utilService.debounce((f) => onSetSortByHandler(f)),
-  );
+  const onSetSortByRef = useRef(null);
+
+  // Initialize debounced function
+  useEffect(() => {
+    if (onSetSortByHandler && typeof onSetSortByHandler === 'function') {
+      onSetSortByRef.current = utilService.debounce((f) => onSetSortByHandler(f), 300);
+    }
+  }, []);
 
   useEffect(() => {
-    if (onSetSortByRef && onSetSortByRef.current)
+    if (onSetSortByRef?.current && typeof onSetSortByRef.current === 'function') {
       onSetSortByRef.current(sortBy);
+    }
   }, [sortBy]);
 
   useEffect(() => {

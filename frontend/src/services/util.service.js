@@ -47,10 +47,18 @@ function randomPastTime() {
 }
 
 function debounce(func, timeout = 500) {
+  if (typeof func !== 'function') {
+    console.warn('debounce: expected a function, got', typeof func);
+    return () => {}; // Return a no-op function if func is not a function
+  }
   let timer
   return (...args) => {
     clearTimeout(timer)
-    timer = setTimeout(() => { func.apply(this, args) }, timeout)
+    timer = setTimeout(() => {
+      if (typeof func === 'function') {
+        func(...args)
+      }
+    }, timeout)
   }
 }
 

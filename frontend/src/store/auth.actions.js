@@ -1,5 +1,8 @@
 import { userService } from "../services/user.service.js";
 import { showSuccessMsg, showErrorMsg } from "../services/event-bus.service.js";
+import { boardService as boardServiceLocal } from "../services/board.service.local.js";
+import { boardService } from "../services/board.service.js";
+import { addBoard } from "./board.actions.js";
 
 export const SIGNUP_SUCCESS = "SIGNUP_SUCCESS";
 export const LOGIN_SUCCESS = "LOGIN_SUCCESS";
@@ -11,7 +14,33 @@ export function signupUser(userData) {
     try {
       const user = await userService.signup(userData);
       dispatch({ type: SIGNUP_SUCCESS, user });
-      showSuccessMsg("Signup successful");
+      
+      // If user is Founder and approved (auto-approved), create a demo board for new company
+      if (user.role === 'Founder' && user.approved && user.companyName) {
+        try {
+          // Check if company already has boards
+          const allBoards = await boardService.query();
+          const companyBoards = allBoards.filter(b => b.companyName === user.companyName);
+          
+          // Only create demo board if company has no boards
+          if (companyBoards.length === 0) {
+            const demoBoard = boardServiceLocal.getEmptyBoard();
+            demoBoard.title = 'My First Board';
+            demoBoard.companyName = user.companyName;
+            demoBoard.visibility = 'public';
+            demoBoard.allowedUsers = [];
+            demoBoard.description = 'Welcome to your first board! This is a demo board that you can edit or remove.';
+            
+            await dispatch(addBoard(demoBoard));
+            showSuccessMsg('Demo board created for your company!');
+          }
+        } catch (boardErr) {
+          console.error('Error creating demo board:', boardErr);
+          // Don't fail signup if board creation fails
+        }
+      }
+      
+      // Success message handled in signup component with toastify
       return user;
     } catch (err) {
       showErrorMsg("Signup failed");
@@ -28,7 +57,9 @@ export function loginUser(credentials) {
       showSuccessMsg("Login successful");
       return user;
     } catch (err) {
-      showErrorMsg("Login failed");
+      // Show specific error message from backend
+      const errorMsg = err.response?.data?.err || err.message || "Invalid email or password";
+      showErrorMsg(errorMsg);
       throw err;
     }
   };
