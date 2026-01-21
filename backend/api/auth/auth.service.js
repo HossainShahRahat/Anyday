@@ -29,11 +29,11 @@ async function login(email, password, isSocialMedia) {
   return user;
 }
 
-async function signup({ email, password, fullname, imgUrl }) {
+async function signup({ email, password, fullname, imgUrl, companyName, role }) {
   const saltRounds = 10;
 
   logger.debug(
-    `auth.service - signup with email: ${email}, fullname: ${fullname}`,
+    `auth.service - signup with email: ${email}, fullname: ${fullname}, role: ${role}, companyName: ${companyName}`,
   );
   if (!email || !password || !fullname)
     return Promise.reject("Missing required signup information");
@@ -43,8 +43,8 @@ async function signup({ email, password, fullname, imgUrl }) {
 
   const hash = await bcrypt.hash(password, saltRounds);
   // New signups default to Employee role and require approval unless specified
-  const userToSave = { email, password: hash, fullname, imgUrl };
-  // Service layer will set defaults for role/approved
+  const userToSave = { email, password: hash, fullname, imgUrl, companyName, role };
+  // Service layer will set defaults for role/approved if not provided
   return userService.add(userToSave);
 }
 
