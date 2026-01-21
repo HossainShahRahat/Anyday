@@ -50,13 +50,6 @@
         margin: 0;
 
       }
-
-      a.active {
-        position: relative;
-        bottom: 37px;
-
-        img {}
-      }
     }
   }
 
@@ -180,13 +173,73 @@
   line-height: 21px;
 }
 
-.nav-bar-logo {
+.nav-a-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 0;
   position: relative;
-  max-height: 44px;
-  min-width: 40.5px !important;
-  max-width: 40.5px;
+  min-height: 50px;
+  margin: 0;
+  width: 100%;
+  
+  a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    min-height: 30px;
+    position: static;
+    transition: opacity 0.2s;
+    
+    &:hover {
+      opacity: 0.8;
+    }
+    
+    &.active {
+      opacity: 1;
+      // Ensure active state doesn't affect icon positioning
+      position: static;
+    }
+  }
+  
+  img {
+    display: block;
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    margin: 0 auto;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+  
+  svg {
+    display: block;
+    width: 32px;
+    height: 32px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    flex-shrink: 0;
+  }
+  
+  .nav-bar-triangle {
+    position: absolute;
+    left: 58px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+
+.nav-bar-logo {
+  width: 32px;
+  height: 32px;
   object-fit: contain;
-  top: 10px;
   filter: brightness(95%);
 }
 
@@ -199,8 +252,10 @@
 .nav-user-hr,
 .nav-logo-hr {
   opacity: 0.25;
-  margin-top: 18px;
+  margin: 12px auto;
   width: 75%;
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 .nav-user-hr {
@@ -215,17 +270,20 @@
   border-top: 10px solid transparent;
   border-bottom: 10px solid transparent;
   border-right: 10px solid #f5f6fa;
-  position: absolute;
-  left: 58px;
-  top: 76px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 1;
+}
+
+.nav-a-container a.active .nav-bar-triangle {
+  opacity: 1;
 }
 
 .nav-bar-board-logo {
-  min-width: 36px;
-  position: relative;
-  // top: 2px;
-  top: 10px;
-  // mix-blend-mode: plus-lighter;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
 }
 
 .nav-bar-avatar {

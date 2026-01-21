@@ -1,8 +1,8 @@
 import Axios from 'axios'
 
-const BASE_URL = process.env.NODE_ENV === 'production'
-    ? '/api/'
-    : '//localhost:3030/api/'
+// Get API base URL from environment variable, with fallback for development
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3030'
+const BASE_URL = `${API_BASE_URL}/api/`
 
 var axios = Axios.create({
     withCredentials: true
@@ -38,8 +38,11 @@ async function ajax(endpoint, method = 'GET', data = null) {
         console.dir(err)
         if (err.response && err.response.status === 401) {
             sessionStorage.clear()
-            window.location.assign('/')
+            window.location.assign('/login')
         }
-        throw err.message
+        // Preserve error response data for proper error messages
+        const error = new Error(err.response?.data?.err || err.message || 'Request failed')
+        error.response = err.response
+        throw error
     }
 }

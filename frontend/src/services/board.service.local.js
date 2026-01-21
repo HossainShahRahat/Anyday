@@ -44,6 +44,7 @@ function findTaskIndex(board, groupIdx, taskId) {
 
 //Board
 export const CHANGE_TITLE = "CHANGE_TITLE";
+export const CHANGE_DESCRIPTION = "CHANGE_DESCRIPTION";
 export const ON_DRAG_GROUP = "ON_DRAG_GROUP";
 export const ON_DRAG_LABEL = "ON_DRAG_LABEL";
 export const ON_DRAG_STATUS = "ON_DRAG_STATUS";
@@ -111,13 +112,7 @@ window.bs = boardService;
 
 async function query(filterBy = getDefaultFilter()) {
   const queryParams = `?title=${filterBy.title}&sortBy=${filterBy.sortBy}&desc=${filterBy.desc}`;
-  let boards = await httpService.get(BASE_URL);
-
-  if (!boards.length) {
-    await httpService.post("board", demoBoard);
-    boards = await httpService.get(BASE_URL + queryParams);
-    return boards;
-  }
+  const boards = await httpService.get(BASE_URL + queryParams);
   return boards;
 }
 
@@ -164,8 +159,9 @@ async function getById(boardId, filterBy = getDefaultFilter()) {
     }
     if (filterBy.sortBy === STATUS_PICKER) {
       let groupsToSet = filteredGroups.map((group) => {
+        if (!Array.isArray(group.tasks)) return group;
         group.tasks = group.tasks.sort(
-          (a, b) => a.status.localeCompare(b.status) * filterBy.desc,
+          (a, b) => (a.status || '').localeCompare(b.status || '') * filterBy.desc,
         );
         return group;
       });
@@ -174,8 +170,9 @@ async function getById(boardId, filterBy = getDefaultFilter()) {
 
     if (filterBy.sortBy === LABEL_STATUS_PICKER) {
       let groupsToSet = filteredGroups.map((group) => {
+        if (!Array.isArray(group.tasks)) return group;
         group.tasks = group.tasks.sort(
-          (a, b) => a.labelStatus.localeCompare(b.labelStatus) * filterBy.desc,
+          (a, b) => (a.labelStatus || '').localeCompare(b.labelStatus || '') * filterBy.desc,
         );
         return group;
       });
@@ -183,8 +180,9 @@ async function getById(boardId, filterBy = getDefaultFilter()) {
     }
     if (filterBy.sortBy === PRIORITY_PICKER) {
       let groupsToSet = filteredGroups.map((group) => {
+        if (!Array.isArray(group.tasks)) return group;
         group.tasks = group.tasks.sort(
-          (a, b) => a.priority.localeCompare(b.priority) * filterBy.desc,
+          (a, b) => (a.priority || '').localeCompare(b.priority || '') * filterBy.desc,
         );
         return group;
       });
@@ -192,8 +190,9 @@ async function getById(boardId, filterBy = getDefaultFilter()) {
     }
     if (filterBy.sortBy === TEXT_LABEL) {
       let groupsToSet = filteredGroups.map((group) => {
+        if (!Array.isArray(group.tasks)) return group;
         group.tasks = group.tasks.sort(
-          (a, b) => a.txt.localeCompare(b.txt) * filterBy.desc,
+          (a, b) => (a.txt || '').localeCompare(b.txt || '') * filterBy.desc,
         );
         return group;
       });
@@ -269,6 +268,9 @@ async function updateBoardService(board, data, type) {
   switch (type) {
     case CHANGE_TITLE:
       board.title = data;
+      return board;
+    case CHANGE_DESCRIPTION:
+      board.description = data;
       return board;
     case ON_DRAG_GROUP:
       board.groups = data;

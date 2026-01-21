@@ -24,7 +24,7 @@ export function ImgUploader({ onUploaded = null, setImgSrc }) {
 
   async function setUserImg(img) {
     try {
-        userService.changeImage(img)
+        await userService.changeImage(img)
     }
     catch (err) {
         console.error(err)
@@ -32,8 +32,22 @@ export function ImgUploader({ onUploaded = null, setImgSrc }) {
 }
 
   return (
-    <div className="upload-preview">
-      <input type="file" onChange={uploadImg} accept="img/*" id="imgUpload" />
+    <div className="upload-preview" style={{ width: '100%', height: '100%' }}>
+      <input 
+        type="file" 
+        onChange={uploadImg} 
+        accept="image/*" 
+        id="imgUpload" 
+        style={{ 
+          width: '100%', 
+          height: '100%', 
+          opacity: 0, 
+          cursor: 'pointer',
+          position: 'absolute',
+          top: 0,
+          left: 0
+        }} 
+      />
     </div>
   )
 }

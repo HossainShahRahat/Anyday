@@ -96,7 +96,7 @@ export function DynamicCmp({ cmp, info, openModal, handleChange }) {
             return <div className="input-number-label-container" >
                 <div className='number-label-container'>
 
-                    <input onChange={utilService.debounce(handleChange)}
+                    <input onChange={handleChange}
                         onFocus={(e) => e.target.placeholder = ""}
                         onBlur={(e) => e.target.placeholder = info.number === 0 ? '' : info.number}
                         type="number" name="number" id="number" placeholder={info.number} />

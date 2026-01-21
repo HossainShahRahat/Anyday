@@ -1,5 +1,5 @@
-import { createStore, combineReducers } from "redux";
-
+import { createStore, combineReducers, applyMiddleware, compose } from "redux";
+import thunk from "redux-thunk";
 import { boardReducer } from "./board.reducer.js";
 import { userReducer } from "./user.reducer.js";
 import { systemReducer } from "./system.reducer";
@@ -12,7 +12,8 @@ const rootReducer = combineReducers({
   systemModule: systemReducer,
 });
 
-const middleware = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-  ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__()
-  : undefined;
+// Setup Redux DevTools and thunk middleware
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const middleware = composeEnhancers(applyMiddleware(thunk));
+
 export const store = createStore(rootReducer, middleware);

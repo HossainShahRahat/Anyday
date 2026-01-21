@@ -1,7 +1,5 @@
 import { Link } from "react-router-dom";
 
-import { LoginFaceBook } from "../facebook-login";
-
 import { Icon } from 'monday-ui-react-core';
 import { MoveArrowRight } from 'monday-ui-react-core/icons';
 
@@ -43,19 +41,11 @@ export function LoginStepOne({ props , users}) {
                             </div>
                         </form>
                     </div>
-                    <div className="login-seperator-container">
-                        <div className="login-seperator">
-                            <span className="seperator-line"></span>
-                            <h2 className="or-sign-in-txt" >Or Sign in with</h2>
-                            <span className="seperator-line"></span>
-                        </div>
-                    </div>
                 </div>
                 <div className="suggest-signup-container">
                     <span className="signup-quest">Don't you have an account yet?</span> <div ><Link className="sign-up" to="/signup">Sign up</Link></div>
                 </div>
             </div>
-            <LoginFaceBook users={users} />
         </section>
     )
 }

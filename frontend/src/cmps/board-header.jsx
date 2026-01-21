@@ -22,15 +22,24 @@ export function BoardHeader({ board, onSetFilterBy }) {
   const boards =
     useSelector((storeState) => storeState.boardModule.boards) || [];
   const [filterBy, setfilterBy] = useState(boardService.getDefaultFilter());
-  onSetFilterBy = useRef(utilService.debounce(onSetFilterBy));
+  const debouncedOnSetFilterBy = useRef(null);
+
+  // Initialize debounced function only once
+  useEffect(() => {
+    if (onSetFilterBy && typeof onSetFilterBy === 'function') {
+      debouncedOnSetFilterBy.current = utilService.debounce(onSetFilterBy, 300);
+    }
+  }, [onSetFilterBy]);
 
   useEffect(() => {
     loadBoards();
   }, []);
 
   useEffect(() => {
-    onSetFilterBy.current(filterBy);
-  }, [filterBy, onSetFilterBy]);
+    if (debouncedOnSetFilterBy.current && typeof debouncedOnSetFilterBy.current === 'function') {
+      debouncedOnSetFilterBy.current(filterBy);
+    }
+  }, [filterBy]);
 
   function handleChange({ target }) {
     let { value, name: field } = target;
@@ -137,7 +146,7 @@ export function BoardHeader({ board, onSetFilterBy }) {
         <div className="board-header-main-container">
           <BoardView board={board} />
           <div className="spacer-header"></div>
-          <BoardFilter onSetFilterBy={onSetFilterBy.current} board={board} />
+          <BoardFilter onSetFilterBy={onSetFilterBy} board={board} />
         </div>
       </section>
     </Fragment>

@@ -89,11 +89,20 @@ export function BoardDetails() {
     cmpsOrder: [],
   };
   useEffect(() => {
+    if (!boardId) return;
     loadBoard(boardId, filterBy);
-    socketService.on(SOCKET_EVENT_UPDATE_BOARD, loadBoard);
     socketService.emit(SOCKET_EMIT_SET_TOPIC, boardId);
+    
+    const handleBoardUpdate = (updatedBoardId) => {
+      if (updatedBoardId === boardId) {
+        loadBoard(boardId, filterBy);
+      }
+    };
+    
+    socketService.on(SOCKET_EVENT_UPDATE_BOARD, handleBoardUpdate);
+    
     return () => {
-      socketService.off(SOCKET_EVENT_UPDATE_BOARD, loadBoard);
+      socketService.off(SOCKET_EVENT_UPDATE_BOARD, handleBoardUpdate);
     };
   }, [boardId, filterBy]);
 

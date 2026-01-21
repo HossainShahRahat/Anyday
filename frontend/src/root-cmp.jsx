@@ -10,6 +10,10 @@ import { UserMsg } from './cmps/user-msg'
 import { Kanban } from './pages/kanban'
 import { Dashboard } from './pages/dashboard'
 import { FounderApprovalsPage } from './pages/founder-approvals'
+import { BoardAssignmentPage } from './pages/board-assignment'
+import { BoardRedirect } from './pages/board-redirect'
+import { ProtectedRoute } from './cmps/ProtectedRoute'
+import { GuestRoute } from './cmps/GuestRoute'
 
 export function RootCmp() {
 
@@ -17,13 +21,78 @@ export function RootCmp() {
         <main>
             <Routes>
                 <Route element={<HomePage />} path="/" />
-                <Route element={<BoardDetails />} path="/board/:boardId" />
-                <Route element={<Kanban />} path="/:boardId/views/kanban" />
-                <Route element={<Dashboard />} path="/:boardId/views/dashboard" />
-                <Route element={<UserDetails />} path="/user-details/:userId" />
-                <Route element={<Login />} path="/login" />
-                <Route element={<SignUp />} path="/signup" />
-                <Route element={<FounderApprovalsPage />} path="/founder/approvals" />
+                <Route 
+                    element={
+                        <GuestRoute>
+                            <Login />
+                        </GuestRoute>
+                    } 
+                    path="/login" 
+                />
+                <Route 
+                    element={
+                        <GuestRoute>
+                            <SignUp />
+                        </GuestRoute>
+                    } 
+                    path="/signup" 
+                />
+                <Route 
+                    element={
+                        <ProtectedRoute>
+                            <BoardRedirect />
+                        </ProtectedRoute>
+                    } 
+                    path="/board" 
+                />
+                <Route 
+                    element={
+                        <ProtectedRoute>
+                            <BoardDetails />
+                        </ProtectedRoute>
+                    } 
+                    path="/board/:boardId" 
+                />
+                <Route 
+                    element={
+                        <ProtectedRoute>
+                            <Kanban />
+                        </ProtectedRoute>
+                    } 
+                    path="/:boardId/views/kanban" 
+                />
+                <Route 
+                    element={
+                        <ProtectedRoute>
+                            <Dashboard />
+                        </ProtectedRoute>
+                    } 
+                    path="/:boardId/views/dashboard" 
+                />
+                <Route 
+                    element={
+                        <ProtectedRoute>
+                            <UserDetails />
+                        </ProtectedRoute>
+                    } 
+                    path="/user-details/:userId" 
+                />
+                <Route 
+                    element={
+                        <ProtectedRoute>
+                            <FounderApprovalsPage />
+                        </ProtectedRoute>
+                    } 
+                    path="/founder/approvals" 
+                />
+                <Route 
+                    element={
+                        <ProtectedRoute>
+                            <BoardAssignmentPage />
+                        </ProtectedRoute>
+                    } 
+                    path="/founder/board-assignment" 
+                />
             </Routes>
         </main>
         <UserMsg />

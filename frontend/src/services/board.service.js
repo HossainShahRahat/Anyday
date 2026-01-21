@@ -14,7 +14,8 @@ export const boardService = {
     remove,
     getEmptyBoard,
     addBoardMsg, 
-    getEmptyTaskComment
+    getEmptyTaskComment,
+    trackView
 }
 
 window.bs = boardService
@@ -72,4 +73,8 @@ function getEmptyTaskComment(txt='',imgUrl='',byMember = {}) {
         imgUrl,
         byMember
     }
+}
+
+async function trackView(boardId) {
+    return httpService.post(`board/${boardId}/view`)
 }

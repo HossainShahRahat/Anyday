@@ -11,11 +11,16 @@ export const SOCKET_EVENT_REVIEW_ABOUT_YOU = 'review-about-you'
 export const SOCKET_EVENT_UPDATE_BOARD = 'event-update-board'
 export const SOCKET_EMIT_UPDATE_BOARD = 'emit-update-board'
 export const SOCKET_EMIT_SET_TOPIC = 'chat-set-topic'
+export const SOCKET_EMIT_JOIN_BOARD = 'board-join'
+export const SOCKET_EMIT_LEAVE_BOARD = 'board-leave'
+export const SOCKET_EVENT_BOARD_USERS = 'board-users-updated'
 
 const SOCKET_EMIT_LOGIN = 'set-user-socket'
 const SOCKET_EMIT_LOGOUT = 'unset-user-socket'
 
-const baseUrl = (process.env.NODE_ENV === 'production') ? '' : '//localhost:3030'
+// Get socket URL from environment variable, with fallback for development
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3030'
+const baseUrl = API_BASE_URL.replace(/^https?:\/\//, '') // Remove http:// or https:// for socket.io
 export const socketService = createSocketService()
 
 // for debugging from console

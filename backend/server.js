@@ -14,8 +14,13 @@ app.use(express.json())
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.resolve(__dirname, 'public')))
 } else {
+    // Get allowed origins from environment variable, with fallback for development
+    const allowedOrigins = process.env.CLIENT_URL 
+        ? process.env.CLIENT_URL.split(',').map(url => url.trim())
+        : ['http://127.0.0.1:3000', 'http://localhost:3000']
+    
     const corsOptions = {
-        origin: ['http://127.0.0.1:3000', 'http://localhost:3000'],
+        origin: allowedOrigins,
         credentials: true
     }
     app.use(cors(corsOptions))

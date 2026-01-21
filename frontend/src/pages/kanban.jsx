@@ -8,16 +8,35 @@ import { handleOnDragEnd, loadBoard } from "../store/board.actions";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { StatusesList } from "../cmps/kanban/statuses-list";
 import { Loader } from "monday-ui-react-core";
+import {
+  socketService,
+  SOCKET_EMIT_SET_TOPIC,
+  SOCKET_EVENT_UPDATE_BOARD,
+} from "../services/socket.service";
 
 export function Kanban() {
   const { boardId } = useParams();
   const board = useSelector((storeState) => storeState.boardModule.board);
 
   useEffect(() => {
+    if (!boardId) return;
     loadBoard(boardId);
+    socketService.emit(SOCKET_EMIT_SET_TOPIC, boardId);
+    
+    const handleBoardUpdate = (updatedBoardId) => {
+      if (updatedBoardId === boardId) {
+        loadBoard(boardId);
+      }
+    };
+    
+    socketService.on(SOCKET_EVENT_UPDATE_BOARD, handleBoardUpdate);
+    
+    return () => {
+      socketService.off(SOCKET_EVENT_UPDATE_BOARD, handleBoardUpdate);
+    };
   }, [boardId]);
 
-  if (!board || !board.groups)
+  if (!board || !board.groups || !Array.isArray(board.statuses) || board.statuses.length === 0)
     return (
       <div className="loader">
         <Loader size={Loader.sizes.LARGE} />
@@ -32,7 +51,7 @@ export function Kanban() {
 
         <DragDropContext
           onDragEnd={(res) =>
-            handleOnDragEnd(res, { board, statuses: board.statuses })
+            handleOnDragEnd(res, { board, statuses: board.statuses || [] })
           }
         >
           <Droppable
@@ -45,7 +64,7 @@ export function Kanban() {
                 className="main-kanban-container flex"
                 ref={provided.innerRef}
               >
-                {board.statuses.map((status, idx) => (
+                {(board.statuses || []).map((status, idx) => (
                   <Draggable
                     draggableId={status.id}
                     key={status.id}
