@@ -14,7 +14,7 @@ import { MoveArrowRight } from 'monday-ui-react-core/icons';
 
 export function SignUp() {
     const boards = useSelector((storeState) => storeState.boardModule.boards)
-    const [credentials, setCredentials] = useState({ email: '', username: '', password: '', fullname: '', imgUrl: '' })
+    const [credentials, setCredentials] = useState({ email: '', username: '', password: '', fullname: '', imgUrl: '', companyName: '', role: 'Employee' })
     const navigate = useNavigate()
 
     function clearState() {
@@ -25,6 +25,16 @@ export function SignUp() {
         const field = ev.target.name
         const value = ev.target.value
         setCredentials({ ...credentials, [field]: value })
+    }
+
+    async function onImageChange(ev) {
+        const file = ev.target.files[0]
+        if (!file) return
+        const reader = new FileReader()
+        reader.onloadend = () => {
+            setCredentials({ ...credentials, imgUrl: reader.result })
+        }
+        reader.readAsDataURL(file)
     }
 
     async function onSignup(ev = null) {
@@ -90,6 +100,38 @@ export function SignUp() {
                                         name="password"
                                         className="password-input"
                                         placeholder="Password" required />
+                                </div>
+                            </div>
+
+                            <div className="form-input-container">
+                                <span className="email-password-label">Company</span>
+                                <div className="company-input-container">
+                                    <input
+                                        onChange={handleChange}
+                                        id="companyName"
+                                        type="text"
+                                        name="companyName"
+                                        className="company-input"
+                                        placeholder="Company name (optional)" />
+                                </div>
+                            </div>
+
+                            <div className="form-input-container">
+                                <span className="email-password-label">Role</span>
+                                <div className="role-select-container">
+                                    <select name="role" value={credentials.role} onChange={handleChange}>
+                                        <option value="Founder">Founder</option>
+                                        <option value="Co-Founder">Co-Founder</option>
+                                        <option value="Employee">Employee</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="form-input-container">
+                                <span className="email-password-label">Profile image</span>
+                                <div className="image-input-container">
+                                    <input type="file" accept="image/*" onChange={onImageChange} />
+                                    {credentials.imgUrl && <img src={credentials.imgUrl} alt="preview" style={{width:80,height:80,objectFit:'cover',marginTop:8}} />}
                                 </div>
                             </div>
                             <div className="next-btn-wrapper">
