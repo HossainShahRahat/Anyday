@@ -14,8 +14,9 @@ import { MoveArrowRight } from 'monday-ui-react-core/icons';
 
 export function SignUp() {
     const boards = useSelector((storeState) => storeState.boardModule.boards)
-    const [credentials, setCredentials] = useState({ email: '', username: '', password: '', fullname: '', imgUrl: '', companyName: '', role: 'Employee' })
+    const [credentials, setCredentials] = useState({ email: '', username: '', password: '', confirmPassword: '', fullname: '', imgUrl: '', companyName: '', role: 'Employee', address: '' })
     const navigate = useNavigate()
+    const [isNewCompany, setIsNewCompany] = useState(false)
 
     function clearState() {
         setCredentials({ email: '', username: '', password: '', fullname: '', imgUrl: '' })
@@ -25,6 +26,22 @@ export function SignUp() {
         const field = ev.target.name
         const value = ev.target.value
         setCredentials({ ...credentials, [field]: value })
+    }
+
+    async function checkCompanyExists(companyName) {
+        if (!companyName) {
+            setIsNewCompany(false)
+            return
+        }
+        try {
+            const users = await userService.getUsers()
+            const exists = users.some(u => u.companyName && u.companyName.toLowerCase() === companyName.toLowerCase())
+            setIsNewCompany(!exists)
+            // if company is new, force Founder role
+            if (!exists) setCredentials(prev => ({ ...prev, role: 'Founder' }))
+        } catch (err) {
+            console.error('Failed checking company existence', err)
+        }
     }
 
     async function onImageChange(ev) {
@@ -39,15 +56,26 @@ export function SignUp() {
 
     async function onSignup(ev = null) {
         if (ev) ev.preventDefault()
-        if (!credentials.email || !credentials.password || !credentials.fullname) return
+        // basic validation
+        if (!credentials.email || !credentials.password || !credentials.fullname) {
+            showErrorMsg('Please fill required fields')
+            return
+        }
+        if (credentials.password !== credentials.confirmPassword) {
+            showErrorMsg('Passwords do not match')
+            return
+        }
         try {
             const user = await userService.signup(credentials)
             showSuccessMsg(`Welcome ${user.fullname}`)
             clearState()
-            navigate(`/board/${boards[0]._id}`)
+            // navigate to first board if available
+            if (boards && boards.length) navigate(`/board/${boards[0]._id}`)
+            else navigate('/')
         }
         catch (err) {
-            console.log('error: ',err)
+            console.log('error: ', err)
+            showErrorMsg('Signup failed')
         }
     }
 
@@ -108,6 +136,7 @@ export function SignUp() {
                                 <div className="company-input-container">
                                     <input
                                         onChange={handleChange}
+                                        onBlur={(e) => checkCompanyExists(e.target.value)}
                                         id="companyName"
                                         type="text"
                                         name="companyName"
@@ -120,9 +149,17 @@ export function SignUp() {
                                 <span className="email-password-label">Role</span>
                                 <div className="role-select-container">
                                     <select name="role" value={credentials.role} onChange={handleChange}>
-                                        <option value="Founder">Founder</option>
-                                        <option value="Co-Founder">Co-Founder</option>
-                                        <option value="Employee">Employee</option>
+                                        {isNewCompany ? (
+                                            <>
+                                                <option value="Founder">Founder</option>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <option value="Founder">Founder</option>
+                                                <option value="Co-Founder">Co-Founder</option>
+                                                <option value="Employee">Employee</option>
+                                            </>
+                                        )}
                                     </select>
                                 </div>
                             </div>
