@@ -82,6 +82,19 @@ async function update(user) {
     }
 }
 
+async function approve(userId, approverId = null) {
+    try {
+        const collection = await dbService.getCollection('user')
+        const update = { $set: { approved: true, approvedBy: approverId } }
+        await collection.updateOne({ _id: ObjectId(userId) }, update)
+        const saved = await getById(userId)
+        return saved
+    } catch (err) {
+        logger.error(`cannot approve user ${userId}`, err)
+        throw err
+    }
+}
+
 async function add(user) {
     try {
         // Normalize fields and include optional auth/profile metadata

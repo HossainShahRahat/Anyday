@@ -46,6 +46,19 @@ async function updateUser(req, res) {
     }
 }
 
+async function approveUser(req, res) {
+    try {
+        const userId = req.params.id
+        // in a real app, use req.user from auth middleware to get approverId
+        const approverId = req.body.approverId || null
+        const updated = await userService.approve(userId, approverId)
+        res.send(updated)
+    } catch (err) {
+        logger.error('Failed to approve user', err)
+        res.status(500).send({ err: 'Failed to approve user' })
+    }
+}
+
 module.exports = {
     getUser,
     getUsers,
